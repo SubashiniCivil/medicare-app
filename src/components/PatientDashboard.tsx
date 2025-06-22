@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,21 @@ import { format, isToday, isBefore, startOfDay } from "date-fns";
 const PatientDashboard = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [takenDates, setTakenDates] = useState<Set<string>>(new Set());
+
+
+  // Load taken dates from localStorage on component mount
+useEffect(() => {
+  const stored = localStorage.getItem("takenDates");
+  if (stored) {
+    setTakenDates(new Set(JSON.parse(stored)));
+  }
+}, []);
+
+// Save taken dates to localStorage whenever it changes
+useEffect(() => {
+  localStorage.setItem("takenDates", JSON.stringify([...takenDates]));
+}, [takenDates]);
+
 
   const today = new Date();
   const todayStr = format(today, 'yyyy-MM-dd');
@@ -43,6 +59,8 @@ const PatientDashboard = () => {
     const isPast = isBefore(date, startOfDay(today));
     const isCurrentDay = isToday(date);
     const isTaken = takenDates.has(dateStr);
+
+    
     
     let className = "";
     
